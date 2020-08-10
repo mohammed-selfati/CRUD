@@ -1,0 +1,168 @@
+		********************************************VIEWS***********************************************
+		************************************link in the description*************************************
+
+
+//layout.blade.php
+<html>
+    <head>
+        <title></title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+
+    </head>
+    <body>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+ 
+
+        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-5">
+            <a class="navbar-brand pl-4"  href="/books">Home</a>
+            <a  href="/books/create" class="text-secondary pl-5"> + Add Book</a>
+        </nav>
+
+ 
+         
+        <div class="container">
+            @yield('content')
+        </div>
+    </body>
+</html>
+
+
+//index.blade.php
+@extends('layout.layout')
+
+@section('content')
+        @if (Session::has('message'))
+            <div class="alert alert-info">{{ Session::get('message') }}</div>
+        @endif
+        <table class="table table-dark rounded">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Task Title</th>
+              <th scope="col">Task Description</th>
+              <th scope="col">Created At</th>
+              <th scope="col">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach($books as $book)
+            <tr>
+              <th scope="row">{{$task->id}}</th>
+              <td><a href="/books/{{$book->id}}" class="text-white">{{$book->title}}</a></td>
+              <td>{{$book->description}}</td>
+              <td>{{$book->created_at->toFormattedDateString()}}</td>
+              <td>
+              <div class="btn-group" role="group" aria-label="Basic example">
+                  <a href="{{ URL::to('books/' . $book->id . '/edit') }}">
+                  	<button type="button" class="btn btn-warning text-white"> 🖊️ Edit</button>
+                  </a>&nbsp;
+                  <form action="{{url('books', [$book->id])}}" method="POST">
+    					<input type="hidden" name="_method" value="DELETE">
+   						<input type="hidden" name="_token" value="{{ csrf_token() }}">
+   						<input type="submit" class="btn btn-danger" value="🗑️ Delete"/>
+   				  </form>
+              </div>
+			</td>
+            </tr>
+            @endforeach
+          </tbody>
+        </table>
+@endsection
+
+
+
+
+//create.blade.php
+@extends('layout.layout')
+
+@section('content')
+    <h1>Add New Task</h1>
+    <hr>
+     <form action="/books" method="post">
+     {{ csrf_field() }}
+      <div class="form-group">
+        <label for="title">Book Title</label>
+        <input type="text" class="form-control" id="bookTitle"  name="title">
+      </div>
+      <div class="form-group">
+        <label for="description">Book Description</label>
+        <input type="text" class="form-control" id="bookDescription" name="description">
+      </div>
+      @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+      @endif
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+@endsection
+
+
+
+
+
+
+//show.blade.php
+@extends('layout.layout')
+
+@section('content')
+            <h1>Showing Book {{ $book->title }}</h1>
+
+    <div class="jumbotron text-center">
+        <p>
+            <strong>Book Title:</strong> {{ $book->title }}---
+            <strong>Description:</strong> {{ $book->description }}
+        </p>
+    </div>
+@endsection
+
+
+
+
+
+
+
+//edit.blade.php
+@extends('layout.layout')
+
+@section('content')
+    <h1>Edit Task</h1>
+    <hr>
+     <form action="{{url('books', [$book->id])}}" method="POST">
+     <input type="hidden" name="_method" value="PUT">
+     {{ csrf_field() }}
+      <div class="form-group">
+        <label for="title">Book Title</label>
+        <input type="text" value="{{$book->title}}" class="form-control" id="bookTitle"  name="title" >
+      </div>
+      <div class="form-group">
+        <label for="description">Book Description</label>
+        <input type="text" value="{{$book->description}}" class="form-control" id="bookDescription" name="description" >
+      </div>
+      @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+      @endif
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+@endsection
+
+
+
+
+
+
+
+
+
